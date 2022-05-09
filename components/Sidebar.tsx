@@ -13,9 +13,9 @@ import SidebarRow from './SidebarRow'
 
 function Sidebar() {
   return (
-    <div className='flex flex-col'>
+    <div className="col-span-2 flex flex-col items-center px-4 md:items-start">
       <img
-        className="h-10 w-10"
+        className="m-3 h-8 w-10"
         src="https://logodownload.org/wp-content/uploads/2014/09/twitter-logo-4.png"
         alt="logo"
       />
