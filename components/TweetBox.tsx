@@ -1,4 +1,11 @@
-import React, { useRef, useState } from 'react'
+import React, {
+  Dispatch,
+  MouseEvent,
+  MouseEventHandler,
+  SetStateAction,
+  useRef,
+  useState,
+} from 'react'
 import {
   CalendarIcon,
   EmojiHappyIcon,
@@ -7,8 +14,15 @@ import {
   SearchCircleIcon,
 } from '@heroicons/react/outline'
 import { useSession } from 'next-auth/react'
+import { Tweet, TweetBody } from '../typings'
+import { fetchTweets } from '../utils/fetchTweets'
+import toast from 'react-hot-toast'
 
-function TweetBox() {
+interface Props {
+  setTweets: Dispatch<SetStateAction<Tweet[]>>
+}
+
+function TweetBox({ setTweets }: Props) {
   const [input, setInput] = useState<string>('')
   const [image, setImage] = useState<string>('')
 
@@ -17,15 +31,52 @@ function TweetBox() {
   const { data: session } = useSession()
   const [imageUrlBoxIsOpen, setImageUrlBoxIsOpen] = useState<boolean>(false)
 
-  const addImageToTweet = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  const addImageToTweet = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
 
     if (!imageInputRef.current?.value) return
 
     setImage(imageInputRef.current.value)
     imageInputRef.current.value = ''
+    setImageUrlBoxIsOpen(false)
+  }
+
+  const postTweet = async () => {
+    const tweetInfo: TweetBody = {
+      text: input,
+      username: session?.user?.name || 'Unknown User',
+      profileImg:
+        session?.user?.image ||
+        'https://pbs.twimg.com/profile_images/1510284014028005379/s5K7C4p3_400x400.jpg',
+      image: image,
+    }
+
+    const result = await fetch(`/api/addTweet`, {
+      body: JSON.stringify(tweetInfo),
+      method: 'POST',
+    })
+
+    const json = await result.json()
+
+    const newTweets = await fetchTweets()
+    setTweets(newTweets)
+
+    toast('Tweet Posted', {
+      icon: '🚀',
+    })
+
+    return json
+  }
+
+  const handleSubmit = (
+    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+  ) => {
+    e.preventDefault()
+
+    postTweet()
+
+    setInput('')
+    setImage('')
     setImageUrlBoxIsOpen(false)
   }
 
@@ -61,6 +112,7 @@ function TweetBox() {
             </div>
 
             <button
+              onClick={handleSubmit}
               disabled={!input || !session}
               className="rounded-full bg-twitter px-5 py-2 font-bold text-white disabled:opacity-40"
             >
