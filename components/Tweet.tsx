@@ -25,8 +25,6 @@ function Tweet({ tweet }: Props) {
     refreshComments()
   }, [])
 
-  console.log(comments)
-
   return (
     <div className="flex flex-col space-x-3 border-y border-gray-100 p-5">
       <div className="flex space-x-3">
