@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
   CalendarIcon,
   EmojiHappyIcon,
@@ -10,8 +10,24 @@ import { useSession } from 'next-auth/react'
 
 function TweetBox() {
   const [input, setInput] = useState<string>('')
+  const [image, setImage] = useState<string>('')
+
+  const imageInputRef = useRef<HTMLInputElement>(null)
+
   const { data: session } = useSession()
   const [imageUrlBoxIsOpen, setImageUrlBoxIsOpen] = useState<boolean>(false)
+
+  const addImageToTweet = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault()
+
+    if (!imageInputRef.current?.value) return
+
+    setImage(imageInputRef.current.value)
+    imageInputRef.current.value = ''
+    setImageUrlBoxIsOpen(false)
+  }
 
   return (
     <div className="flex space-x-2 p-5">
@@ -53,10 +69,29 @@ function TweetBox() {
           </div>
 
           {imageUrlBoxIsOpen && (
-            <form>
-              <input type="text" />
-              <button>Add image</button>
+            <form className="mt-5 flex rounded-lg bg-twitter/80 py-2 px-4">
+              <input
+                ref={imageInputRef}
+                className="flex-1 bg-transparent p-2 text-white outline-none placeholder:text-white"
+                type="text"
+                placeholder="Enter Image URL..."
+              />
+              <button
+                type="submit"
+                onClick={addImageToTweet}
+                className="font-bold text-white"
+              >
+                Add image
+              </button>
             </form>
+          )}
+
+          {image && (
+            <img
+              className="mt-10 h-40 w-full rounded-xl object-contain shadow-lg"
+              src={image}
+              alt=""
+            />
           )}
         </form>
       </div>
