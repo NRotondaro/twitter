@@ -1,7 +1,6 @@
 import React, {
   Dispatch,
   MouseEvent,
-  MouseEventHandler,
   SetStateAction,
   useRef,
   useState,
@@ -55,8 +54,8 @@ function TweetBox({ setTweets }: Props) {
       body: JSON.stringify(tweetInfo),
       method: 'POST',
     })
-
-    const json = await result.json()
+      .then((res) => res.json)
+      .catch((error) => console.log(error))
 
     const newTweets = await fetchTweets()
     setTweets(newTweets)
@@ -65,7 +64,7 @@ function TweetBox({ setTweets }: Props) {
       icon: '🚀',
     })
 
-    return json
+    return result
   }
 
   const handleSubmit = (

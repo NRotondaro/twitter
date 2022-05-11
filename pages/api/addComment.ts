@@ -1,26 +1,28 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { TweetBody } from '../../typings'
+import { Comment } from '../../typings'
 
 type Data = {
-  message: string
+  name: string
 }
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const data: TweetBody = JSON.parse(req.body)
+  const comment: Comment = JSON.parse(req.body)
 
   const mutations = {
     mutations: [
       {
         create: {
-          _type: 'tweet',
-          text: data.text,
-          username: data.username,
-          blockTweet: false,
-          profileImg: data.profileImg,
-          image: data.image,
+          _type: 'comment',
+          comment: comment.comment,
+          username: comment.username,
+          profileImg: comment.profileImg,
+          tweet: {
+            _type: 'reference',
+            _ref: comment.tweetId,
+          },
         },
       },
     ],
@@ -35,9 +37,8 @@ export default async function handler(
     },
     body: JSON.stringify(mutations),
     method: 'POST',
-  })
-    .then((res) => res.json())
-    .catch((error) => console.log(error))
+  }).then((res) => res.json())
+  .catch((error) => console.log(error))
 
-  res.status(200).json({ message: 'Tweet Added!' })
+  res.status(200).json({ name: 'Comment Added!' })
 }
