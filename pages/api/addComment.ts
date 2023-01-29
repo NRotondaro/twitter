@@ -1,15 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { Comment } from '../../typings'
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { Comment } from '../../typings';
 
 type Data = {
-  name: string
-}
+  name: string;
+};
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  const comment: Comment = JSON.parse(req.body)
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+  const comment: Comment = JSON.parse(req.body);
 
   const mutations = {
     mutations: [
@@ -26,9 +23,9 @@ export default async function handler(
         },
       },
     ],
-  }
+  };
 
-  const apiEndpoint = `https://${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}.api.sanity.io/v2021-06-07/data/mutate/${process.env.NEXT_PUBLIC_SANITY_DATASET}`
+  const apiEndpoint = `https://${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}.api.sanity.io/v2021-06-07/data/mutate/${process.env.NEXT_PUBLIC_SANITY_DATASET}`;
 
   const result = await fetch(apiEndpoint, {
     headers: {
@@ -37,8 +34,9 @@ export default async function handler(
     },
     body: JSON.stringify(mutations),
     method: 'POST',
-  }).then((res) => res.json())
-  .catch((error) => console.log(error))
+  })
+    .then((res) => res.json())
+    .catch((error) => console.log(error));
 
-  res.status(200).json({ name: 'Comment Added!' })
+  res.status(200).json({ name: 'Comment Added!' });
 }
